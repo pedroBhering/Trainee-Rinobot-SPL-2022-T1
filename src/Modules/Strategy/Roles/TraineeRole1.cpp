@@ -4,6 +4,12 @@
 #include "Core/Utils/RobotDefs.h"
 #include "Core/Utils/CartesianCoord.h"
 
+int TraineeRole1::timeH = 0;
+int TraineeRole1::timeLow = 0;
+int TraineeRole1::timeFound = 0;
+int TraineeRole1::timeSp = 0;
+int TraineeRole1::timeSay = 0;
+
 TraineeRole1::TraineeRole1(SpellBook *spellBook) : Role(spellBook)
 {
     onStart = false;
@@ -43,48 +49,54 @@ void TraineeRole1::Tick(float ellapsedTime, const SensorValues &sensor)
     if (spellBook->strategy.GameState == STATE_PLAYING && onStart)
     {
 
-        if(spellBook->perception.vision.ball.BallDetected){
-            
-            if(timeSay < 100){
+        if (spellBook->perception.vision.ball.BallDetected)
+        {
+            if (timeSay < 100)
+            {
                 SAY(string("ball spotted"));
                 timeSp++;
             }
             else
                 timeSp = 0;
-            
             float ballAngle = spellBook->perception.vision.ball.BallYaw;
-            
-            while(ballAngle > 0.1){
-             spellBook->motion.Vx = 0;      
-             spellBook->motion.Vth = Deg2Rad(0.1f);
+            while (ballAngle > 0.1)
+            {
+                spellBook->motion.Vx = 0;
+                spellBook->motion.Vth = Deg2Rad(0.1f);
             }
 
-            if(timeLow < 200){
+            if (timeLow < 200)
+            {
                 spellBook->motion.HeadPitch = Deg2Rad(90.0f);
                 timeLow++;
             }
 
-            else{
-                if(timeH < 200){
+            else
+            {
+                if (timeH < 200)
+                {
                     spellBook->motion.HeadPitch = Deg2Rad(0.0f);
                     timeH++;
                 }
-                else{
+                else
+                {
                     timeLow = 0;
                     timeH = 0;
                 }
             }
 
-            if(spellBook->perception.vision.ball.BallDistance < 0.5 && spellBook->perception.vision.ball.BallDistance >= 0.3){
+            if (spellBook->perception.vision.ball.BallDistance < 0.5 && spellBook->perception.vision.ball.BallDistance >= 0.3)
+            {
                 spellBook->motion.Vx -= 0.05;
             }
 
             else
                 spellBook->motion.Vx = 0.2;
 
-            if(spellBook->perception.vision.ball.BallDistance < 0.1)
+            if (spellBook->perception.vision.ball.BallDistance < 0.1)
             {
-                if(timeFound < 100){
+                if (timeFound < 100)
+                {
                     SAY(string("I found the ball"));
                     timeFound++;
                 }
@@ -93,8 +105,10 @@ void TraineeRole1::Tick(float ellapsedTime, const SensorValues &sensor)
             }
         }
 
-        else{
-            if(timeSay < 300){
+        else
+        {
+            if (timeSay < 300)
+            {
                 SAY(string("Finding the ball"));
                 timeSay;
             }
@@ -103,13 +117,13 @@ void TraineeRole1::Tick(float ellapsedTime, const SensorValues &sensor)
         }
 
         cout << "na role trainee1, " << endl;
-        //spellBook->motion.Vth = Deg2Rad(0); // SETA A VELOCIDADE ANGULAR PARA 0 GRAUS
-        //spellBook->motion.Vx = 0.2; // SETA A VELOCIDADE LINEAR PARA 0 m/s (NAO COLOQUE MAIS QUE 0.2m/s!!!)
-        //spellBook->motion.HeadPitch = Deg2Rad(0.0f); // ANGULACAO DA CABECA DO ROBO, POSITIVO O ROBO OLHA PRA BAIXO, NEGATIVO PRA CIMA
-        // informacoes disponiveis:
-            // spellBook->perception.vision.ball.BallDetected // SE ESTA VENDO A BOLA
-            // spellBook->perception.vision.ball.BallDistance // DISTANCIA ATE A BOLA em metros
-            // spellBook->perception.vision.ball.BallYaw > Deg2Rad(10.0f) // ANGULACAO DA BOLA EM X
-            // spellBook->motion.HeadPitch = Deg2Rad(24.0f); // OLHA PRA BAIXO
+        // spellBook->motion.Vth = Deg2Rad(0); // SETA A VELOCIDADE ANGULAR PARA 0 GRAUS
+        // spellBook->motion.Vx = 0.2; // SETA A VELOCIDADE LINEAR PARA 0 m/s (NAO COLOQUE MAIS QUE 0.2m/s!!!)
+        // spellBook->motion.HeadPitch = Deg2Rad(0.0f); // ANGULACAO DA CABECA DO ROBO, POSITIVO O ROBO OLHA PRA BAIXO, NEGATIVO PRA CIMA
+        //  informacoes disponiveis:
+        //  spellBook->perception.vision.ball.BallDetected // SE ESTA VENDO A BOLA
+        //  spellBook->perception.vision.ball.BallDistance // DISTANCIA ATE A BOLA em metros
+        //  spellBook->perception.vision.ball.BallYaw > Deg2Rad(10.0f) // ANGULACAO DA BOLA EM X
+        //  spellBook->motion.HeadPitch = Deg2Rad(24.0f); // OLHA PRA BAIXO
     }
 }

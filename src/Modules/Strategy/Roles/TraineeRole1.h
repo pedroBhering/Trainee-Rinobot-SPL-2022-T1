@@ -5,24 +5,23 @@
 
 using namespace std;
 
-class TraineeRole1: public Role {
+class TraineeRole1 : public Role
+{
 
 private:
     bool onStart;
     int variavelQualquer;
-    int timeH = 0; //variavel de controle para fazer o robo manter a cabeça reta
-    int timeLow = 0; //variavel de controle para fazer o robo abaixar a cabeça
-    int timeFound = 0; //variavel de controle para fazer o robo falar que a bola foi encontrada
-    int timeSp = 0; //variavel de controle para fazer o robo falar que a bola foi avistada
-    int timeSay = 0; //variavel de controle para fazer o robo falar que está procurando a bola
-    bool spinL = false; //girou para a esquerda
-    bool spinR = false; //girou para a direita
+    static int timeH;     // variavel de controle para fazer o robo manter a cabeça reta
+    static int timeLow;   // variavel de controle para fazer o robo abaixar a cabeça
+    static int timeFound; // variavel de controle para fazer o robo falar que a bola foi encontrada
+    static int timeSp;    // variavel de controle para fazer o robo falar que a bola foi avistada
+    static int timeSay;   // variavel de controle para fazer o robo falar que está procurando a bola
+    // bool spinL = false; //girou para a esquerda
+    // bool spinR = false; //girou para a direita
 
 public:
-
     TraineeRole1(SpellBook *spellBook);
     ~TraineeRole1();
-    void Tick(float ellapsedTime, const SensorValues&);
-
+    void Tick(float ellapsedTime, const SensorValues &);
 };
 #endif
