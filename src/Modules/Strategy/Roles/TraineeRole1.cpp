@@ -42,11 +42,70 @@ void TraineeRole1::Tick(float ellapsedTime, const SensorValues &sensor)
     }
     if (spellBook->strategy.GameState == STATE_PLAYING && onStart)
     {
-        cout << "na role trainee1, " << endl;
-        spellBook->motion.Vth = Deg2Rad(0); // SETA A VELOCIDADE ANGULAR PARA 0 GRAUS
-        spellBook->motion.Vx = 0.2; // SETA A VELOCIDADE LINEAR PARA 0 m/s (NAO COLOQUE MAIS QUE 0.2m/s!!!)
-        spellBook->motion.HeadPitch = Deg2Rad(0.0f); // ANGULACAO DA CABECA DO ROBO, POSITIVO O ROBO OLHA PRA BAIXO, NEGATIVO PRA CIMA
 
+        if(spellBook->perception.vision.ball.BallDetected){
+            
+            if(timeSay < 100){
+                SAY(string("ball spotted"));
+                timeSp++;
+            }
+            else
+                timeSp = 0;
+            
+            float ballAngle = spellBook->perception.vision.ball.BallYaw;
+            
+            while(ballAngle > 0.1){
+             spellBook->motion.Vx = 0;      
+             spellBook->motion.Vth = Deg2Rad(0.1f);
+            }
+
+            if(timeLow < 200){
+                spellBook->motion.HeadPitch = Deg2Rad(90.0f);
+                timeLow++;
+            }
+
+            else{
+                if(timeH < 200){
+                    spellBook->motion.HeadPitch = Deg2Rad(0.0f);
+                    timeH++;
+                }
+                else{
+                    timeLow = 0;
+                    timeH = 0;
+                }
+            }
+
+            if(spellBook->perception.vision.ball.BallDistance < 0.5 && spellBook->perception.vision.ball.BallDistance >= 0.3){
+                spellBook->motion.Vx -= 0.05;
+            }
+
+            else
+                spellBook->motion.Vx = 0.2;
+
+            if(spellBook->perception.vision.ball.BallDistance < 0.1)
+            {
+                if(timeFound < 100){
+                    SAY(string("I found the ball"));
+                    timeFound++;
+                }
+                else
+                    timeFound = 0;
+            }
+        }
+
+        else{
+            if(timeSay < 300){
+                SAY(string("Finding the ball"));
+                timeSay;
+            }
+            else
+                timeSay = 0;
+        }
+
+        cout << "na role trainee1, " << endl;
+        //spellBook->motion.Vth = Deg2Rad(0); // SETA A VELOCIDADE ANGULAR PARA 0 GRAUS
+        //spellBook->motion.Vx = 0.2; // SETA A VELOCIDADE LINEAR PARA 0 m/s (NAO COLOQUE MAIS QUE 0.2m/s!!!)
+        //spellBook->motion.HeadPitch = Deg2Rad(0.0f); // ANGULACAO DA CABECA DO ROBO, POSITIVO O ROBO OLHA PRA BAIXO, NEGATIVO PRA CIMA
         // informacoes disponiveis:
             // spellBook->perception.vision.ball.BallDetected // SE ESTA VENDO A BOLA
             // spellBook->perception.vision.ball.BallDistance // DISTANCIA ATE A BOLA em metros
