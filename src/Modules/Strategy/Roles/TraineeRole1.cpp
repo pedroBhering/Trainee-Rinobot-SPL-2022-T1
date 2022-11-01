@@ -4,14 +4,19 @@
 #include "Core/Utils/RobotDefs.h"
 #include "Core/Utils/CartesianCoord.h"
 
-int TraineeRole1::timeH = 0;
-int TraineeRole1::timeLow = 0;
-int TraineeRole1::timeFound = 0;
-int TraineeRole1::timeSp = 0;
-int TraineeRole1::timeSay = 0;
-
 TraineeRole1::TraineeRole1(SpellBook *spellBook) : Role(spellBook)
 {
+    timeH = 0;
+    timeLow = 0;
+    timeFound = 0;
+    timeSp = 0;
+    timeSay = 0;
+    spinL = false;
+    spinR = false;
+    timeL = 0;
+    timeR = 0;
+    degree = 0;
+    spinB = false;
     onStart = false;
 }
 TraineeRole1::~TraineeRole1()
@@ -53,17 +58,21 @@ void TraineeRole1::Tick(float ellapsedTime, const SensorValues &sensor)
         {
             if (timeSay < 100)
             {
-                SAY(string("ball spotted"));
                 timeSp++;
             }
             else
+            {
+                SAY(string("ball spotted"));
                 timeSp = 0;
+            }
             float ballAngle = spellBook->perception.vision.ball.BallYaw;
-            while (ballAngle > 0.1)
+            while (ballAngle > 0.01)
             {
                 spellBook->motion.Vx = 0;
                 spellBook->motion.Vth = Deg2Rad(0.1f);
             }
+
+            spellBook->motion.Vth = Deg2Rad(0.0f);
 
             if (timeLow < 200)
             {
@@ -85,7 +94,7 @@ void TraineeRole1::Tick(float ellapsedTime, const SensorValues &sensor)
                 }
             }
 
-            if (spellBook->perception.vision.ball.BallDistance < 0.5 && spellBook->perception.vision.ball.BallDistance >= 0.3)
+            if (spellBook->perception.vision.ball.BallDistance < 0.5 && spellBook->perception.vision.ball.BallDistance >= 0.1 && spellBook->motion.Vx >= 0)
             {
                 spellBook->motion.Vx -= 0.05;
             }
@@ -95,13 +104,15 @@ void TraineeRole1::Tick(float ellapsedTime, const SensorValues &sensor)
 
             if (spellBook->perception.vision.ball.BallDistance < 0.1)
             {
+                spellBook->motion.Vx = 0;   
                 if (timeFound < 100)
                 {
-                    SAY(string("I found the ball"));
                     timeFound++;
                 }
-                else
-                    timeFound = 0;
+                else{
+                    SAY(string("I found the ball"));
+                    timeFound = 0;   
+                }
             }
         }
 
@@ -109,11 +120,58 @@ void TraineeRole1::Tick(float ellapsedTime, const SensorValues &sensor)
         {
             if (timeSay < 300)
             {
-                SAY(string("Finding the ball"));
-                timeSay;
+                timeSay++;
             }
-            else
+            else{
+                SAY(string("Finding the ball"));
                 timeSay = 0;
+            }
+
+            spellBook->motion.Vx = 0.2;
+
+            if(!spinL && !spinR && !spinB){
+                if(timeL < 200)
+                {
+                    timeL++;
+                    spellBook->motion.HeadYaw = Deg2Rad(-90.0f);
+                }
+                else{
+                    spinL = true;
+                    spinR = true;
+                }
+            }
+
+            if(spinL && spinR && !spinB){
+                if(timeR < 200){
+                    timeR++;
+                    spellBook->motion.HeadYaw = Deg2Rad(180.0f);
+                }
+                else{
+                    spinB = true;
+                    spinL = false;
+                    spinR = false;
+                }
+
+            }
+
+            if(spinB){
+                spellBook->motion.HeadYaw = Deg2Rad(-90.0f);
+                if(degree < 900){
+                    spellBook->motion.Vth = Deg2Rad(0.2f);
+                    degree++;
+                }
+                else{
+                    spellBook->motion.Vth = Deg2Rad(0.0f);
+                    degree = 0;
+                    spinB = false;
+                }
+                       
+            }
+
+
+
+
+
         }
 
         cout << "na role trainee1, " << endl;
