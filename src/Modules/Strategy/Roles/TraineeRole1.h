@@ -13,6 +13,31 @@ private:
     bool ballSpotted;
     int timeBall;
     bool ballHere;
+    int gap;
+    int timePitch;
+    float angle;
+    bool foundBall;
+    bool para;
+    bool dist;
+    float ballDistActual;
+    float ballDistPrevious;
+    bool rodou;
+    bool abaixouC;
+    bool headHigh;
+    bool headLow;
+    bool headLeft;
+    bool headRight;
+    int andou;
+    float h;
+    float ballDistanceDif;
+    float ballD;
+    int timeLow;
+    int timeHigh;
+    int timeLeft;
+    int timeRight;
+
+
+    lookingForTheBall();
 
 
 
@@ -20,7 +45,6 @@ private:
 
     int variavelQualquer;
     int timeH;     // variavel de controle para fazer o robo manter a cabeça reta
-    int timeLow;   // variavel de controle para fazer o robo abaixar a cabeça
     int timeFound; // variavel de controle para fazer o robo falar que a bola foi encontrada
     int timeSp;    // variavel de controle para fazer o robo falar que a bola foi avistada
     int timeSay;   // variavel de controle para fazer o robo falar que está procurando a bola
