@@ -10,6 +10,14 @@ class TraineeRole1 : public Role
 
 private:
     bool onStart;
+    bool ballSpotted;
+    int timeBall;
+    bool ballHere;
+
+
+
+
+
     int variavelQualquer;
     int timeH;     // variavel de controle para fazer o robo manter a cabeça reta
     int timeLow;   // variavel de controle para fazer o robo abaixar a cabeça

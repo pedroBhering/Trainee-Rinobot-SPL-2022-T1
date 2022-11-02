@@ -13,10 +13,19 @@ TraineeRole1::TraineeRole1(SpellBook *spellBook) : Role(spellBook)
     timeSay = 0;
     spinL = false;
     spinR = false;
+    spinB = false;
     timeL = 0;
     timeR = 0;
     degree = 0;
-    spinB = false;
+
+    ballSpotted = false;
+    timeBall = 0;
+    ballHere = false;
+    gap = 0;
+    angle = 0;
+    timePitch = 0;
+    foundBall = false;
+
     onStart = false;
 }
 TraineeRole1::~TraineeRole1()
@@ -53,127 +62,53 @@ void TraineeRole1::Tick(float ellapsedTime, const SensorValues &sensor)
     }
     if (spellBook->strategy.GameState == STATE_PLAYING && onStart)
     {
+        if(spellBook->perception.vision.ball.BallDetected && !ballSpotted){
+            spellBook->motion.Vx = 0;
 
-        if (spellBook->perception.vision.ball.BallDetected)
-        {
-            if (timeSay < 100)
+            while(timePitch < 5)
             {
-                timeSp++;
+                timePitch++;
+                spellBook->motion.HeadPitch = Deg2Rad(-angle);
             }
-            else
-            {
-                SAY(string("ball spotted"));
-                timeSp = 0;
+
+            if(!foundBall){
+                SAY("I found the ball");
+                foundBall = true;
             }
+            ballSpotted = true;
             float ballAngle = spellBook->perception.vision.ball.BallYaw;
-            while (ballAngle > 0.01)
+            while (ballAngle > 0.01 || ballAngle < -0.01)
+            {
+                if(ballAngle > 0)
+                    spellBook->motion.Vth = Deg2Rad(0.1f);
+                else
+                    spellBook->motion.Vth = Deg2Rad(-0.1f);
+            }
+            spellBook->motion.Vth = Deg2Rad(0.0f);
+            timeBall = (spellBook->perception.vision.ball.BallDistance / 0.2)*0.02;
+        }
+        else if(ballSpotted && time < timeBall){
+            spellBook->motion.Vx = 0.2;
+            time++;
+            if(spellBook->perception.vision.ball.BallDistance <= 0.01)
             {
                 spellBook->motion.Vx = 0;
-                spellBook->motion.Vth = Deg2Rad(0.1f);
-            }
-
-            spellBook->motion.Vth = Deg2Rad(0.0f);
-
-            if (timeLow < 200)
-            {
-                spellBook->motion.HeadPitch = Deg2Rad(90.0f);
-                timeLow++;
-            }
-
-            else
-            {
-                if (timeH < 200)
-                {
-                    spellBook->motion.HeadPitch = Deg2Rad(0.0f);
-                    timeH++;
-                }
-                else
-                {
-                    timeLow = 0;
-                    timeH = 0;
-                }
-            }
-
-            if (spellBook->perception.vision.ball.BallDistance < 0.5 && spellBook->perception.vision.ball.BallDistance >= 0.1 && spellBook->motion.Vx >= 0)
-            {
-                spellBook->motion.Vx -= 0.05;
-            }
-
-            else
-                spellBook->motion.Vx = 0.2;
-
-            if (spellBook->perception.vision.ball.BallDistance < 0.1)
-            {
-                spellBook->motion.Vx = 0;   
-                if (timeFound < 100)
-                {
-                    timeFound++;
-                }
-                else{
-                    SAY(string("I found the ball"));
-                    timeFound = 0;   
+                if(!ballHere){
+                    SAY("The ball is here");
+                    ballHere = true;
                 }
             }
         }
 
-        else
-        {
-            if (timeSay < 300)
-            {
-                timeSay++;
-            }
-            else{
-                SAY(string("Finding the ball"));
-                timeSay = 0;
-            }
-
-            spellBook->motion.Vx = 0.2;
-
-            if(!spinL && !spinR && !spinB){
-                if(timeL < 200)
-                {
-                    timeL++;
-                    spellBook->motion.HeadYaw = Deg2Rad(-90.0f);
-                }
-                else{
-                    spinL = true;
-                    spinR = true;
-                }
-            }
-
-            if(spinL && spinR && !spinB){
-                if(timeR < 200){
-                    timeR++;
-                    spellBook->motion.HeadYaw = Deg2Rad(180.0f);
-                }
-                else{
-                    spinB = true;
-                    spinL = false;
-                    spinR = false;
-                }
-
-            }
-
-            if(spinB){
-                spellBook->motion.HeadYaw = Deg2Rad(-90.0f);
-                if(degree < 900){
-                    spellBook->motion.Vth = Deg2Rad(0.2f);
-                    degree++;
-                }
-                else{
-                    spellBook->motion.Vth = Deg2Rad(0.0f);
-                    degree = 0;
-                    spinB = false;
-                }
-                       
-            }
-
-
-
-
-
+        else{
+            spellBook->motion.Vx = 0;
+            foundBall = false;
+            ballSpotted = false;
+            ballHere = false;
+            time = 0;
         }
 
+        
         cout << "na role trainee1, " << endl;
         // spellBook->motion.Vth = Deg2Rad(0); // SETA A VELOCIDADE ANGULAR PARA 0 GRAUS
         // spellBook->motion.Vx = 0.2; // SETA A VELOCIDADE LINEAR PARA 0 m/s (NAO COLOQUE MAIS QUE 0.2m/s!!!)
