@@ -13,7 +13,6 @@ private:
     bool ballSpotted;
     int timeBall;
     bool ballHere;
-    int gap;
     int timePitch;
     float angle;
     bool foundBall;
@@ -35,25 +34,23 @@ private:
     int timeHigh;
     int timeLeft;
     int timeRight;
+    int time;
+    bool procurou;
+    bool rodouAux;
+    float ballAngle;
+    bool findAngle;
+    bool headLowHead;
+    int timeLowHead;
+    bool rodando;
+    int back;
+    int timeAux;
+    bool close;
 
-
-    lookingForTheBall();
-
-
-
-
-
-    int variavelQualquer;
-    int timeH;     // variavel de controle para fazer o robo manter a cabeça reta
-    int timeFound; // variavel de controle para fazer o robo falar que a bola foi encontrada
-    int timeSp;    // variavel de controle para fazer o robo falar que a bola foi avistada
-    int timeSay;   // variavel de controle para fazer o robo falar que está procurando a bola
-    int timeL;
-    int timeR;
-    bool spinL; //girou para a esquerda
-    bool spinR; //girou para a direita
-    bool spinB;
-    int degree;
+    void lookingForTheBall();
+    void spinBody(float spinAngle);
+    void turnBack();
+    void headLH();
+    void bodyTurnBack();
 
 public:
     TraineeRole1(SpellBook *spellBook);
