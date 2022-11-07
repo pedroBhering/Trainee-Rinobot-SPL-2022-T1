@@ -46,20 +46,20 @@ void TraineeRole1::bodyTurnBack()
 {
     if (back < 150)
     {
-        spellBook->motion.Vth = Deg2Rad(10.0f);
+        spellBook->motion.Vth = Deg2Rad(-10.0f);
         back++;
     }
     else
     {
         spellBook->motion.Vth = Deg2Rad(0.0f);
         back = 0;
+        timeLeft = 0;
         timeLow = 0;
         timeHigh = 0;
-        timeLeft = 0;
         timeRight = 0;
+        headLeft = false;
         headLow = false;
         headHigh = false;
-        headLeft = false;
         headRight = false;
     }
 }
@@ -84,7 +84,7 @@ void TraineeRole1::lookingForTheBall()
     if (timeLeft < 50 && !headLeft)
     {
         timeLeft++;
-        spellBook->motion.HeadYaw = DEG2RAD(90.0f);
+        spellBook->motion.Vth = DEG2RAD(20.0f);
         cout << "Girou para Esquerda" << endl;
     }
     else
@@ -102,7 +102,7 @@ void TraineeRole1::lookingForTheBall()
             if (timeRight < 100 && !headRight && headLow)
             {
                 timeRight++;
-                spellBook->motion.HeadYaw = DEG2RAD(-90.0f);
+                spellBook->motion.Vth = DEG2RAD(-20.0f);
                 cout << "Girou para a direita" << endl;
             }
             else
@@ -168,7 +168,7 @@ void TraineeRole1::Tick(float ellapsedTime, const SensorValues &sensor)
             if (!foundBall)
             {
                 cout << "viu a bola 2 " << endl;
-                // SAY("I found the ball");
+                SAY("I found the ball");
                 foundBall = true;
             }
 
@@ -191,7 +191,7 @@ void TraineeRole1::Tick(float ellapsedTime, const SensorValues &sensor)
                     spellBook->motion.Vx = 0;
                     if (!ballHere)
                     {
-                        // SAY("The ball is here");
+                        SAY("The ball is here");
                         ballHere = true;
                     }
                 }
@@ -217,7 +217,7 @@ void TraineeRole1::Tick(float ellapsedTime, const SensorValues &sensor)
                     spellBook->motion.Vx = 0;
                     if (!ballHere)
                     {
-                        // SAY("The ball is here");
+                        SAY("The ball is here");
                         ballHere = true;
                     }
                 }
@@ -255,7 +255,7 @@ void TraineeRole1::Tick(float ellapsedTime, const SensorValues &sensor)
                         cout << "Perto da bola: " << ballD << endl;
                         if (!ballHere)
                         {
-                            // SAY("The ball is here");
+                            SAY("The ball is here");
                             ballHere = true;
                         }
                     }
