@@ -10,8 +10,6 @@ TraineeRole1::TraineeRole1(SpellBook *spellBook) : Role(spellBook)
     ballSpotted = false;
     timeBall = 0;
     ballHere = false;
-    angle = 0;
-    timePitch = 0;
     foundBall = false;
     time = 0;
 
@@ -48,7 +46,7 @@ void TraineeRole1::bodyTurnBack()
 {
     if (back < 150)
     {
-        spellBook->motion.Vth = Deg2Rad(15.0f);
+        spellBook->motion.Vth = Deg2Rad(10.0f);
         back++;
     }
     else
@@ -69,12 +67,12 @@ void TraineeRole1::bodyTurnBack()
 void TraineeRole1::spinBody(float spinAngle)
 {
     cout << "Angulo da bola: " << spinAngle << endl;
-    if (spinAngle >= 20 || spinAngle <= -20) // verifica se o angulo em relacao a bola esta para esquerda ou direita e
+    if (spinAngle >= 10 || spinAngle <= -10) // verifica se o angulo em relacao a bola esta para esquerda ou direita e
     {
         if (spinAngle > 0)
-            spellBook->motion.Vth = Deg2Rad(15.0f);
+            spellBook->motion.Vth = Deg2Rad(-10.0f);
         else
-            spellBook->motion.Vth = Deg2Rad(-15.0f);
+            spellBook->motion.Vth = Deg2Rad(10.0f);
     }
     else
         spellBook->motion.Vth = Deg2Rad(0.0f);
@@ -130,26 +128,6 @@ void TraineeRole1::lookingForTheBall()
     }
 }
 
-/*
-
-calculo da distancia percorrida:
-ballDistActual = spellBook->perception.vision.ball.BallDistance; //uma vez
-timeAux = 0;
-dist = true;
-(primeiro if)
-
-//segundo if
-timeAux += ellapsedTime
-if((ballDistActual < (0.1*timeAux - 0.01)) || ballDistActual > (0.2*timeAux + 0.01)){
-cout << "Indo ate a bola" << endl;
-spellBook->motion.Vx = 0.1;
-}
-else{
-ballSpotted = false; //logo faz procurar a bola novamente
-dist = false;
-}
-*/
-
 void TraineeRole1::Tick(float ellapsedTime, const SensorValues &sensor)
 {
     spellBook->strategy.MoveHead = false;
@@ -183,15 +161,6 @@ void TraineeRole1::Tick(float ellapsedTime, const SensorValues &sensor)
     {
         if (spellBook->perception.vision.ball.BallDetected)
         {
-            timeLow = 0;
-            timeHigh = 0;
-            timeLeft = 0;
-            timeRight = 0;
-            back = 0;
-            headLow = false;
-            headHigh = false;
-            headLeft = false;
-            headRight = false;
             spellBook->motion.HeadPitch = Deg2Rad(30.0f);
             // spellBook->motion.HeadYaw = DEG2RAD(0.0f);
             cout << "Viu a bola" << endl;
@@ -199,7 +168,7 @@ void TraineeRole1::Tick(float ellapsedTime, const SensorValues &sensor)
             if (!foundBall)
             {
                 cout << "viu a bola 2 " << endl;
-                SAY("I found the ball");
+                // SAY("I found the ball");
                 foundBall = true;
             }
 
@@ -215,17 +184,17 @@ void TraineeRole1::Tick(float ellapsedTime, const SensorValues &sensor)
                 close = false;
                 ballHere = false;
                 ballDistanceDif = spellBook->perception.vision.ball.BallDistance;
-                /* ballDistActual = spellBook->perception.vision.ball.BallDistance;
-                dist = true;
-                cout << "Primeira Distnacia: " << ballDistActual << endl;
-
-                if((ballDistActual - 0.1) > h){
-                ballD = sqrt(pow((ballDistActual - 0.1), 2) - pow(h, 2));
+                if (ballDistanceDif <= 0.25)
+                {
+                    timeBallSave = 0;
+                    close = true;
+                    spellBook->motion.Vx = 0;
+                    if (!ballHere)
+                    {
+                        // SAY("The ball is here");
+                        ballHere = true;
+                    }
                 }
-
-                else{
-                ballD = 0.2;
-                } */
             }
 
             else
@@ -240,47 +209,18 @@ void TraineeRole1::Tick(float ellapsedTime, const SensorValues &sensor)
                 }
                 else
                 {
+                    ballAngle = spellBook->perception.vision.ball.BallYaw;
+                    spinBody(ballAngle);
+                    dist = false;
                     timeBallSave = 0;
                     close = true;
                     spellBook->motion.Vx = 0;
                     if (!ballHere)
                     {
-                        SAY("The ball is here");
+                        // SAY("The ball is here");
                         ballHere = true;
                     }
                 }
-                /* ballDistPrevious = ballDistActual;
-                ballDistActual = spellBook->perception.vision.ball.BallDistance;
-                ballDistanceDif = ballDistActual - ballDistPrevious;
-
-                if(ballDistanceDif > 0)
-                {
-                ballSpotted = false;
-                }
-
-                else if((ballDistActual - 0.1) > h){
-                ballD = sqrt(pow((ballDistActual - 0.1), 2) - pow(h, 2));
-                }
-
-                else{
-                ballD = 0.2;
-                }
-
-                cout << "Atual: " << ballDistActual << endl;
-                cout << "Anterior: " << ballDistPrevious << endl;
-                cout << ballD << endl;
-
-                if(ballD <= 0.3)
-                {
-                spellBook->motion.Vth = 0;
-                cout << "Perto da bola: " << ballD << endl;
-                ballDistActual = spellBook->perception.vision.ball.BallDistance;
-                spellBook->motion.Vx = 0;
-                if(!ballHere){
-                SAY("The ball is here");
-                ballHere = true;
-                }
-                } */
             }
         }
         if (ballSpotted)
@@ -310,17 +250,18 @@ void TraineeRole1::Tick(float ellapsedTime, const SensorValues &sensor)
                     spellBook->motion.Vx = 0;
                     timeBallSave += ellapsedTime;
                     cout << "Tempo sem ver a bola: " << timeBallSave << endl;
-                    if (timeBallSave < 2)
+                    if (timeBallSave < 5)
                     {
                         cout << "Perto da bola: " << ballD << endl;
                         if (!ballHere)
                         {
-                            SAY("The ball is here");
+                            // SAY("The ball is here");
                             ballHere = true;
                         }
                     }
                     else
                     {
+                        spellBook->motion.Vth = 0;
                         spellBook->motion.HeadPitch = Deg2Rad(0.0f);
                         ballSpotted = false; // logo faz procurar a bola novamente
                         dist = false;
@@ -332,7 +273,7 @@ void TraineeRole1::Tick(float ellapsedTime, const SensorValues &sensor)
                 spellBook->motion.Vx = 0;
                 timeBallSave += ellapsedTime;
                 cout << "Tempo sem ver a bola: " << timeBallSave << endl;
-                if (timeBallSave < 2)
+                if (timeBallSave < 5)
                 {
                     cout << "Perto da bola: " << ballD << endl;
                     if (!ballHere)
@@ -343,6 +284,7 @@ void TraineeRole1::Tick(float ellapsedTime, const SensorValues &sensor)
                 }
                 else
                 {
+                    spellBook->motion.Vth = 0;
                     spellBook->motion.HeadPitch = Deg2Rad(0.0f);
                     ballSpotted = false; // logo faz procurar a bola novamente
                     dist = false;
@@ -350,37 +292,13 @@ void TraineeRole1::Tick(float ellapsedTime, const SensorValues &sensor)
             }
             else
             {
+                spellBook->motion.Vth = 0;
+
                 spellBook->motion.HeadPitch = Deg2Rad(0.0f);
                 spellBook->motion.Vx = 0;
                 ballSpotted = false; // logo faz procurar a bola novamente
                 dist = false;
             }
-            /* if(ballD <= 0.3)
-            { spellBook->motion.Vth = 0;
-            cout << "Perto da bola: " << ballD << endl;
-            ballDistActual = spellBook->perception.vision.ball.BallDistance;
-            dist = false;
-            spellBook->motion.Vx = 0;
-            if(!ballHere){
-            SAY("The ball is here");
-            ballHere = true;
-            }
-            }
-            else{
-            if(andou < 100){
-            cout << "Indo ate a bola" << endl;
-            if(andou == 50){
-            spellBook->motion.Vx = 0;
-            headLH();
-            }
-            else{
-            andou++;
-            spellBook->motion.Vx = 0.1;
-            }
-            }
-            else if(andou >= 99)
-            ballSpotted = false;
-            } */
         }
 
         else
@@ -392,15 +310,5 @@ void TraineeRole1::Tick(float ellapsedTime, const SensorValues &sensor)
             dist = false;
             // SAY("Looking");
         }
-
-        // cout << "na role trainee1, " << endl;
-        // spellBook->motion.Vth = Deg2Rad(0); // SETA A VELOCIDADE ANGULAR PARA 0 GRAUS
-        // spellBook->motion.Vx = 0.2; // SETA A VELOCIDADE LINEAR PARA 0 m/s (NAO COLOQUE MAIS QUE 0.2m/s!!!)
-        // spellBook->motion.HeadPitch = Deg2Rad(0.0f); // ANGULACAO DA CABECA DO ROBO, POSITIVO O ROBO OLHA PRA BAIXO, NEGATIVO PRA CIMA
-        // informacoes disponiveis:
-        // spellBook->perception.vision.ball.BallDetected // SE ESTA VENDO A BOLA
-        // spellBook->perception.vision.ball.BallDistance // DISTANCIA ATE A BOLA em metros
-        // spellBook->perception.vision.ball.BallYaw > Deg2Rad(10.0f) // ANGULACAO DA BOLA EM X
-        // spellBook->motion.HeadPitch = Deg2Rad(24.0f); // OLHA PRA BAIXO
     }
 }
