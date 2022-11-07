@@ -199,11 +199,11 @@ void TraineeRole1::Tick(float ellapsedTime, const SensorValues &sensor)
 
             else
             {
-                cout << "Dist percorrida 1: " << 0.1 * timeAux << endl;
+                cout << "Dist percorrida 1: " << 0.15 * timeAux << endl;
                 cout << "Dist encontrada 1: " << ballDistActual << endl;
                 ballDistanceDif = spellBook->perception.vision.ball.BallDistance;
                 cout << "Dist na hora: " << ballDistanceDif << endl;
-                if ((ballDistActual > (0.1 * timeAux + 0.2)) && ballDistanceDif > 0.2)
+                if ((ballDistActual > (0.15 * timeAux + 0.2)) && ballDistanceDif > 0.2)
                 {
                     cout << "Indo ate a bola" << endl;
                 }
@@ -233,17 +233,17 @@ void TraineeRole1::Tick(float ellapsedTime, const SensorValues &sensor)
             headHigh = false;
             headLeft = false;
             headRight = false;
-            cout << "Dist percorrida 2: " << 0.1 * timeAux << endl;
+            cout << "Dist percorrida 2: " << 0.15 * timeAux << endl;
             cout << "Dist encontrada 2: " << ballDistActual << endl;
             spellBook->motion.Vth = Deg2Rad(0.0f);
             timeAux += ellapsedTime;
             cout << "Tempo decorrido: " << timeAux << endl;
-            if ((ballDistActual > (0.1 * timeAux + 0.2)))
+            if ((ballDistActual > (0.15 * timeAux + 0.2)))
             {
                 if (!close)
                 {
                     cout << "Indo ate a bola" << endl;
-                    spellBook->motion.Vx = 0.1;
+                    spellBook->motion.Vx = 0.15;
                 }
                 else
                 {
